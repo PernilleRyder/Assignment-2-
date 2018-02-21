@@ -1,0 +1,234 @@
+---
+title: "Computational Modeling - Week 4 - Assignment 2 - Part 1"
+author: "Riccardo Fusaroli"
+date: "2/19/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## In this assignment we learn how to assess rates from a binomial distribution, using the case of assessing your teachers' knowledge of CogSci
+
+### First part
+
+You want to assess your teachers' knowledge of cognitive science. "These guys are a bunch of drama(turgist) queens, mindless philosophers, chattering communication people and Russian spies. Do they really know CogSci?", you think.
+
+To keep things simple (your teachers should not be faced with too complicated things):
+- You created a pool of equally challenging questions on CogSci
+- Each question can be answered correctly or not (we don't allow partially correct answers, to make our life simpler).
+- Knowledge of CogSci can be measured on a scale from 0 (negative knowledge, all answers wrong) through 0.5 (random chance) to 1 (awesome CogSci superpowers)
+
+This is the data:
+- Riccardo: 3 correct answers out of 6 questions
+- Kristian: 2 correct answers out of 2 questions (then he gets bored)
+- Josh: 160 correct answers out of 198 questions (Josh never gets bored)
+- Mikkel: 66 correct answers out of 132 questions
+
+### Data in a dataframe
+```{r}
+
+ID = c("Riccardo", "Kristian", "Josh", "Mikkel")
+Correct = c(3,2, 160, 66)
+Total = c(6, 2, 198, 132)
+
+
+data = data.frame(ID, Correct, Total)
+
+```
+
+Questions:
+
+1. What's Riccardo's estimated knowledge of CogSci? 0.5, chance level
+
+What is the probability he knows more than chance (0.5) [try figuring this out. if you can't peek into chapters 3.1 and 3.2 and/or the slides]? 0.5, chance level
+
+- First implement a grid approximation (hint check paragraph 2.4.1!) with a uniform prior, calculate the posterior and plot the results
+
+- Then implement a quadratic approximation (hint check paragraph 2.4.2!).
+- N.B. for the rest of the exercise just keep using the grid approximation (we'll move to quadratic approximations in two classes)
+```{r}
+#Define the grid
+dens=20
+p_grid <- seq( from=0 , to=1 , length.out=dens)
+
+#Define the prior
+prior <- rep( 1 , dens ) # Flat
+# prior <- ifelse(p_grid < 0.5 , 0 , 1) #informed
+# prior <- exp(-5*abs( p_grid - 0.5) #conservative
+
+#Compute the likelihood at each value in grid
+likelihood_R <- dbinom( 3 , size=6 , prob=p_grid )
+
+#Compute the posterior (likelihood by prior)
+unstd.posterior_R <- likelihood * prior
+
+#Standardize the posterior (so it sums to 1)
+posterior_R <- unstd.posterior_R/ sum(unstd.posterior)
+
+#Draw the plot
+grid_data_R=data.frame(grid=p_grid,posterior=posterior,prior=prior,likelihood=likelihood)
+
+library(ggplot2)
+ggplot(grid_data_R,aes(grid,posterior))+  geom_point()+geom_line()+theme_classic()+  geom_line(aes(grid,prior/dens),color='red')+  xlab("probability of correct")+ ylab("posterior probability")
+
+#probabiltiy of knowing more than chance
+sum(posterior[p_grid < 0.5])
+
+
+#Quadratic approximation
+library(rethinking)
+
+quadR = map(
+  alist(
+    c ~ dbinom(6,p),
+    p ~ dunif(0,1)
+  ),
+  data=list(c=3))
+
+precise(quadR)
+
+c = 3
+n = 6
+curve(dbeta(x, c+1, n-c+1), from=0, to=1)
+curve(dnorm(x, 0.5, 0.2), lty=2, add=TRUE)
+
+```
+
+2. Estimate all the teachers' knowledge of CogSci. Who's best? Use grid approximation. 
+Comment on and compare the posteriors of Riccardo and Mikkel.
+
+## Because Mikkel has answered more questions than Riccardo, the graph is more narrow/focused to the probability of 0.5. A new data point would not change Mikkels graph but would have a radical influence on Riccardo's graph. 
+
+2a. Produce plots of the prior, and posterior for each teacher.
+```{r}
+#Kristian
+
+dens=20
+p_grid <- seq( from=0 , to=1 , length.out=dens)
+
+#Define the prior
+prior <- rep( 1 , dens ) # Flat
+# prior <- ifelse(p_grid < 0.5 , 0 , 1) #informed
+# prior <- exp(-5*abs( p_grid - 0.5) #conservative
+
+#Compute the likelihood at each value in grid
+likelihood_K <- dbinom( 2 , size=2 , prob=p_grid )
+
+#Compute the posterior (likelihood by prior)
+unstd.posterior_K <- likelihood_K * prior
+
+#Standardize the posterior (so it sums to 1)
+posterior_K <- unstd.posterior_K / sum(unstd.posterior_K)
+
+
+#Draw the plot
+grid_data_K=data.frame(grid=p_grid,posterior=posterior_K,prior=prior,likelihood=likelihood_K)
+
+ggplot(grid_data_K,aes(grid,posterior))+  geom_point()+geom_line()+theme_classic()+  geom_line(aes(grid,prior/dens),color='red')+  xlab("probability of correct")+ ylab("posterior probability")
+
+#Josh
+
+dens=20
+p_grid <- seq( from=0 , to=1 , length.out=dens)
+
+#Define the prior
+prior <- rep( 1 , dens ) # Flat
+# prior <- ifelse(p_grid < 0.5 , 0 , 1) #informed
+# prior <- exp(-5*abs( p_grid - 0.5) #conservative
+
+#Compute the likelihood at each value in grid
+likelihood_J <- dbinom( 160 , size=198 , prob=p_grid )
+
+#Compute the posterior (likelihood by prior)
+unstd.posterior_J <- likelihood_J * prior
+
+#Standardize the posterior (so it sums to 1)
+posterior_J <- unstd.posterior_J / sum(unstd.posterior_J)
+
+
+#Draw the plot
+grid_data_J=data.frame(grid=p_grid,posterior=posterior_J,prior=prior,likelihood=likelihood_J)
+
+ggplot(grid_data_J,aes(grid,posterior))+  geom_point()+geom_line()+theme_classic()+  geom_line(aes(grid,prior/dens),color='red')+  xlab("probability of correct")+ ylab("posterior probability")
+
+#Mikkel
+dens=20
+p_grid <- seq( from=0 , to=1 , length.out=dens)
+
+#Define the prior
+prior <- rep( 1 , dens ) # Flat
+# prior <- ifelse(p_grid < 0.5 , 0 , 1) #informed
+# prior <- exp(-5*abs( p_grid - 0.5) #conservative
+
+#Compute the likelihood at each value in grid
+likelihood_M <- dbinom( 66 , size=132 , prob=p_grid )
+
+#Compute the posterior (likelihood by prior)
+unstd.posterior_M <- likelihood_M * prior
+
+#Standardize the posterior (so it sums to 1)
+posterior_M <- unstd.posterior_M / sum(unstd.posterior_M)
+
+#Draw the plot
+grid_data_M=data.frame(grid=p_grid,posterior=posterior_M,prior=prior,likelihood=likelihood_M)
+
+ggplot(grid_data_M,aes(grid,posterior))+  geom_point()+geom_line()+theme_classic()+  geom_line(aes(grid,prior/dens),color='red')+  xlab("probability of correct")+ ylab("posterior probability")
+```
+
+3. Change the prior. Given your teachers have all CogSci jobs, you should start with a higher appreciation of their knowledge: the prior is a normal distribution with a mean of 0.8 and a standard deviation of 0.2. Do the results change (and if so how)?
+
+3a. Produce plots of the prior and posterior for each teacher.
+
+```{r}
+
+
+
+```
+
+4. You go back to your teachers and collect more data (multiply the previous numbers by 100). Calculate their knowledge with both a uniform prior and a normal prior with a mean of 0.8 and a standard deviation of 0.2. Do you still see a difference between the results? Why?
+
+```{r}
+
+
+
+```
+
+5. Imagine you're a skeptic and think your teachers do not know anything about CogSci, given the content of their classes. How would you operationalize that belief?
+
+```{r}
+
+
+
+```
+
+6. Optional question: Can you estimate the difference between Riccardo's estimated knowledge and that of each of the other teachers? Would you deem it credible (that is, would you believe that it is actually different)?
+
+```{r}
+
+```
+
+7. Bonus knowledge: all the stuff we have done can be implemented in a lme4-like fashion using the brms package. Here is an example.
+
+```{r}
+library(brms)
+d <- data.frame(
+  Correct=c(3,2,160,66),
+  Total=c(6,2,198,132),
+  ID=c("Riccardo","Kristian","Josh","Mikkel"))
+
+FlatModel <- brm(Correct|trials(Questions)~1,data=subset(d,Teacher=="RF"),prior=prior("uniform(0,1)", class = "Intercept"))
+plot(FlatModel)
+PositiveModel <- brm(Correct|trials(Questions)~1,data=subset(d,Teacher=="RF"),prior=prior("normal(0.8,0.2)", class = "Intercept"))
+plot(PositiveModel)
+SkepticalModel <- brm(Correct|trials(Questions)~1,data=subset(d,Teacher=="RF"),prior=prior("normal(0.5,0.01)", class = "Intercept"))
+plot(SkepticalModel)
+```
+
+If you dare, try to tweak the data and model to test two hypotheses:
+- Is Kristian different from Josh?
+- Is Josh different from chance?
+
+
+
