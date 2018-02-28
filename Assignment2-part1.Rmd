@@ -62,13 +62,13 @@ prior <- rep( 1 , dens ) # Flat
 likelihood_R <- dbinom( 3 , size=6 , prob=p_grid )
 
 #Compute the posterior (likelihood by prior)
-unstd.posterior_R <- likelihood * prior
+unstd.posterior_R <- likelihood_R * prior
 
 #Standardize the posterior (so it sums to 1)
-posterior_R <- unstd.posterior_R/ sum(unstd.posterior)
+posterior_R <- unstd.posterior_R/ sum(unstd.posterior_R)
 
 #Draw the plot
-grid_data_R=data.frame(grid=p_grid,posterior=posterior,prior=prior,likelihood=likelihood)
+grid_data_R=data.frame(grid=p_grid,posterior=posterior_R,prior=prior,likelihood=likelihood_R)
 
 library(ggplot2)
 ggplot(grid_data_R,aes(grid,posterior))+  geom_point()+geom_line()+theme_classic()+  geom_line(aes(grid,prior/dens),color='red')+  xlab("probability of correct")+ ylab("posterior probability")
@@ -154,7 +154,7 @@ grid_data_J=data.frame(grid=p_grid,posterior=posterior_J,prior=prior,likelihood=
 ggplot(grid_data_J,aes(grid,posterior))+  geom_point()+geom_line()+theme_classic()+  geom_line(aes(grid,prior/dens),color='red')+  xlab("probability of correct")+ ylab("posterior probability")
 
 #Mikkel
-dens=20
+dens=80
 p_grid <- seq( from=0 , to=1 , length.out=dens)
 
 #Define the prior
@@ -182,26 +182,206 @@ ggplot(grid_data_M,aes(grid,posterior))+  geom_point()+geom_line()+theme_classic
 3a. Produce plots of the prior and posterior for each teacher.
 
 ```{r}
+#prior change Riccardo
+dens=20
+p_grid <- seq( from=0 , to=1 , length.out=dens)
+
+#Define the prior
+prior <- dnorm( p_grid, mean=0.8, sd=0.2) 
+
+#Compute the likelihood at each value in grid
+likelihood_R <- dbinom( 3 , size=6 , prob=p_grid )
+
+#Compute the posterior (likelihood by prior)
+unstd.posterior_R <- likelihood_R * prior
+
+#Standardize the posterior (so it sums to 1)
+posterior_R <- unstd.posterior_R / sum(unstd.posterior_R)
+
+#Draw the plot
+grid_data_R=data.frame(grid=p_grid,posterior=posterior_R,prior=prior,likelihood=likelihood_R)
+
+ggplot(grid_data_R,aes(grid,posterior))+  geom_point()+geom_line()+theme_classic()+  geom_line(aes(grid,prior/dens),color='red')+  xlab("probability of correct")+ ylab("posterior probability")
 
 
+#prior change Kristian
+dens=20
+p_grid <- seq( from=0 , to=1 , length.out=dens)
 
+#Define the prior
+prior <- dnorm( p_grid, mean=0.8, sd=0.2)
+
+#Compute the likelihood at each value in grid
+likelihood_K <- dbinom( 2 , size=2 , prob=p_grid )
+
+#Compute the posterior (likelihood by prior)
+unstd.posterior_K <- likelihood_K * prior
+
+#Standardize the posterior (so it sums to 1)
+posterior_K <- unstd.posterior_K / sum(unstd.posterior_K)
+
+#Draw the plot
+grid_data_K=data.frame(grid=p_grid,posterior=posterior_K,prior=prior,likelihood=likelihood_K)
+
+ggplot(grid_data_K,aes(grid,posterior))+  geom_point()+geom_line()+theme_classic()+  geom_line(aes(grid,prior/dens),color='red')+  xlab("probability of correct")+ ylab("posterior probability")
+
+
+#prior change in Josh
+dens=20
+p_grid <- seq( from=0 , to=1 , length.out=dens)
+
+#Define the prior
+prior_J <- dnorm(p_grid, mean = 0.8, sd=0.2)
+
+#Compute the likelihood at each value in grid
+likelihood_J <- dbinom( 160 , size=198 , prob=p_grid )
+
+#Compute the posterior (likelihood by prior)
+unstd.posterior_J <- likelihood_J * prior_J
+
+#Standardize the posterior (so it sums to 1)
+posterior_J <- unstd.posterior_J / sum(unstd.posterior_J)
+
+#Draw the plot
+grid_data_J=data.frame(grid=p_grid,posterior=posterior_J,prior=prior_J,likelihood=likelihood_J)
+
+ggplot(grid_data_J,aes(grid,posterior))+ geom_point()+geom_line()+theme_classic()+  geom_line(aes(grid,prior/dens),color='red')+  xlab("probability of correct")+ ylab("posterior probability")
+
+#prior change in Mikkel
+dens=80
+p_grid <- seq( from=0 , to=1 , length.out=dens)
+
+#Define the prior
+prior_M <- dnorm(p_grid, mean= 0.8, sd=0.2)
+
+#Compute the likelihood at each value in grid
+likelihood_M <- dbinom( 66 , size=132 , prob=p_grid )
+
+#Compute the posterior (likelihood by prior)
+unstd.posterior_M <- likelihood_M * prior_M
+
+#Standardize the posterior (so it sums to 1)
+posterior_M <- unstd.posterior_M / sum(unstd.posterior_M)
+
+#Draw the plot
+grid_data_M=data.frame(grid=p_grid,posterior=posterior_M,prior=prior_M,likelihood=likelihood_M)
+
+ggplot(grid_data_M,aes(grid,posterior))+  geom_point()+geom_line()+theme_classic()+  geom_line(aes(grid,prior/dens),color='red')+  xlab("probability of correct")+ ylab("posterior probability")
 ```
+Do the results change (and if so how)?
+The plots show that the prior have a large influence on particpants with a small amount of questions, but does only have a small infleunce on particpants with many questions. 
+The more questions the teachers has answered the less infleunce the prior has on the posterior. 
+Having a gaussian distributed prior affects the distribution of the posterior in a gaussian direction. 
+
 
 4. You go back to your teachers and collect more data (multiply the previous numbers by 100). Calculate their knowledge with both a uniform prior and a normal prior with a mean of 0.8 and a standard deviation of 0.2. Do you still see a difference between the results? Why?
 
 ```{r}
+#prior change Riccardo
+dens=100
+p_grid <- seq( from=0 , to=1 , length.out=dens)
 
+#Define the prior
+prior_R <- dnorm( p_grid, mean=0.8, sd=0.2) 
+#prior_R <- rep( 1 , dens ) #flat
 
+#Compute the likelihood at each value in grid
+likelihood_R <- dbinom( 300 , size=600 , prob=p_grid )
+
+#Compute the posterior (likelihood by prior)
+unstd.posterior_R <- likelihood_R * prior_R
+
+#Standardize the posterior (so it sums to 1)
+posterior_R <- unstd.posterior_R / sum(unstd.posterior_R)
+
+#Draw the plot
+grid_data_R=data.frame(grid=p_grid,posterior=posterior_R,prior=prior_R,likelihood=likelihood_R)
+
+ggplot(grid_data_R,aes(grid,posterior))+  geom_point()+geom_line()+theme_classic()+  geom_line(aes(grid,prior/dens),color='red')+  xlab("probability of correct")+ ylab("posterior probability")
 
 ```
 
-5. Imagine you're a skeptic and think your teachers do not know anything about CogSci, given the content of their classes. How would you operationalize that belief?
 
 ```{r}
+#prior change Kristian
+dens=100
+p_grid <- seq( from=0 , to=1 , length.out=dens)
+
+#Define the prior
+prior_K <- dnorm( p_grid, mean=0.8, sd=0.2)
+#prior_K <- rep( 1 , dens ) #flat
+
+#Compute the likelihood at each value in grid
+likelihood_K <- dbinom( 200 , size=200 , prob=p_grid )
+
+#Compute the posterior (likelihood by prior)
+unstd.posterior_K <- likelihood_K * prior_K
+
+#Standardize the posterior (so it sums to 1)
+posterior_K <- unstd.posterior_K / sum(unstd.posterior_K)
+
+#Draw the plot
+grid_data_K=data.frame(grid=p_grid,posterior=posterior_K,prior=prior_K,likelihood=likelihood_K)
+
+ggplot(grid_data_K,aes(grid,posterior))+  geom_point()+geom_line()+theme_classic()+  geom_line(aes(grid,prior/dens),color='red')+  xlab("probability of correct")+ ylab("posterior probability")
+```
 
 
+```{r}
+#prior change in Josh
+dens=20
+p_grid <- seq( from=0 , to=1 , length.out=dens)
+
+#Define the prior
+prior_J <- dnorm(p_grid, mean = 0.8, sd=0.2)
+#prior_J <- rep( 1 , dens ) #flat
+
+#Compute the likelihood at each value in grid
+likelihood_J <- dbinom( 16000 , size=19800 , prob=p_grid )
+
+#Compute the posterior (likelihood by prior)
+unstd.posterior_J <- likelihood_J * prior_J
+
+#Standardize the posterior (so it sums to 1)
+posterior_J <- unstd.posterior_J / sum(unstd.posterior_J)
+
+#Draw the plot
+grid_data_J=data.frame(grid=p_grid,posterior=posterior_J,prior=prior_J,likelihood=likelihood_J)
+
+ggplot(grid_data_J,aes(grid,posterior))+ geom_point()+geom_line()+theme_classic()+  geom_line(aes(grid,prior/dens),color='red')+  xlab("probability of correct")+ ylab("posterior probability")
+```
+
+```{r}
+#prior change in Mikkel
+dens=100
+p_grid <- seq( from=0 , to=1 , length.out=dens)
+
+#Define the prior
+prior_M <- dnorm(p_grid, mean= 0.8, sd=0.2)
+#prior_M <- rep( 1 , dens ) #flat
+
+#Compute the likelihood at each value in grid
+likelihood_M <- dbinom( 6600 , size=13200 , prob=p_grid )
+
+#Compute the posterior (likelihood by prior)
+unstd.posterior_M <- likelihood_M * prior_M
+
+#Standardize the posterior (so it sums to 1)
+posterior_M <- unstd.posterior_M / sum(unstd.posterior_M)
+
+#Draw the plot
+grid_data_M=data.frame(grid=p_grid,posterior=posterior_M,prior=prior_M,likelihood=likelihood_M)
+
+ggplot(grid_data_M,aes(grid,posterior))+  geom_point()+geom_line()+theme_classic()+  geom_line(aes(grid,prior/dens),color='red')+  xlab("probability of correct")+ ylab("posterior probability")
 
 ```
+Do you still see a difference between the results? Why?
+Yes there is still a difference but it is very small. The reason for this is that the prior does not influence a large amount of data points. 
+
+
+5. Imagine you're a skeptic and think your teachers do not know anything about CogSci, given the content of their classes. How would you operationalize that belief?
+We would set the mean at change level (0.5) and have a large standard deviation. Our argument for this is that we assume they don't know anyhitng and therefore they will have 50% chance of answering correct. The variance has be to large because because we expect that when the level are at chance, the particpants may answer many questions wrong in a row.  
+
 
 6. Optional question: Can you estimate the difference between Riccardo's estimated knowledge and that of each of the other teachers? Would you deem it credible (that is, would you believe that it is actually different)?
 
